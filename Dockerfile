@@ -1,5 +1,4 @@
-# 使用官方 Node.js 18 Alpine 基础镜像
-FROM node:18-alpine
+FROM node:lts-bullseye-slim
 
 # 设置工作目录
 WORKDIR /app
@@ -9,6 +8,8 @@ COPY package*.json ./
 
 # 安装依赖
 RUN npm ci || npm install && npm cache clean --force
+
+RUN npx playwright install && npm cache clean --force
 
 # 拷贝源码
 COPY . .
