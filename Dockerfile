@@ -18,8 +18,8 @@ COPY . .
 RUN npm run build
 
 # 创建非root用户
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+RUN addgroup --gid 1001 nodejs && \
+    adduser --uid 1001 --gid 1001 --disabled-password --gecos "" nodejs
 
 # 更改文件所有权
 RUN chown -R nodejs:nodejs /app
