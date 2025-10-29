@@ -47,7 +47,7 @@ RUN mkdir /ms-playwright && \
     mkdir /ms-playwright-agent && \
     cd /ms-playwright-agent && npm init -y && \
     npm i playwright && \
-    npm exec --no -- playwright install --with-deps && rm -rf /var/lib/apt/lists/* && \
+    npm exec --no -- playwright install chromium --with-deps && rm -rf /var/lib/apt/lists/* && \
     # Workaround for https://github.com/microsoft/playwright/issues/27313
     # While the gstreamer plugin load process can be in-process, it ended up throwing
     # an error that it can't have libsoup2 and libsoup3 in the same process because
@@ -59,7 +59,6 @@ RUN mkdir /ms-playwright && \
     fi && \
     rm -rf /ms-playwright-agent && \
     rm -rf ~/.npm/ && \
-    npm cache clean --force \
     chmod -R 777 /ms-playwright
 
 RUN addgroup --gid 1001 nodejs && \
