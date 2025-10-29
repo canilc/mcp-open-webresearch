@@ -48,15 +48,6 @@ RUN mkdir /ms-playwright && \
     cd /ms-playwright-agent && npm init -y && \
     npm i playwright && \
     npm exec --no -- playwright install chromium --with-deps && rm -rf /var/lib/apt/lists/* && \
-    # Workaround for https://github.com/microsoft/playwright/issues/27313
-    # While the gstreamer plugin load process can be in-process, it ended up throwing
-    # an error that it can't have libsoup2 and libsoup3 in the same process because
-    # libgstwebrtc is linked against libsoup2. So we just remove the plugin.
-    if [ "$(uname -m)" = "aarch64" ]; then \
-        rm /usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstwebrtc.so; \
-    else \
-        rm /usr/lib/x86_64-linux-gnu/gstreamer-1.0/libgstwebrtc.so; \
-    fi && \
     rm -rf /ms-playwright-agent && \
     rm -rf ~/.npm/ && \
     chmod -R 777 /ms-playwright
