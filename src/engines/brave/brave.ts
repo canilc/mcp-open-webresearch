@@ -10,7 +10,7 @@ const RESULTS_PER_PAGE = 10;
  * @param $ Cheerio root instance
  * @returns Array of parsed search results
  */
-function parseResults($: cheerio.Root): SearchResult[] {
+function parseResults($: cheerio.CheerioAPI): SearchResult[] {
   const resultsContainer = $("#results");
 
   return resultsContainer

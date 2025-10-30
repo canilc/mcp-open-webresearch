@@ -1,10 +1,30 @@
 import axios from "axios";
 import { loadConfig } from "../../config/loader.js";
+import { globalRateLimiter } from "../../utils/rateLimiter.js";
 
 const config = loadConfig();
 if (config.proxy.enabled && config.proxy.isValid && config.proxy.agent) {
   axios.defaults.httpAgent = config.proxy.agent.http;
   axios.defaults.httpsAgent = config.proxy.agent.https;
+}
+
+// Initialize rate limiter with config
+if (config.rateLimiting.enabled) {
+  config.rateLimiting.engines.bing &&
+    globalRateLimiter.setConfig("bing", {
+      maxRequests: config.rateLimiting.engines.bing.maxRequests,
+      windowMs: config.rateLimiting.engines.bing.windowMinutes * 60 * 1000,
+    });
+  config.rateLimiting.engines.duckduckgo &&
+    globalRateLimiter.setConfig("duckduckgo", {
+      maxRequests: config.rateLimiting.engines.duckduckgo.maxRequests,
+      windowMs: config.rateLimiting.engines.duckduckgo.windowMinutes * 60 * 1000,
+    });
+  config.rateLimiting.engines.brave &&
+    globalRateLimiter.setConfig("brave", {
+      maxRequests: config.rateLimiting.engines.brave.maxRequests,
+      windowMs: config.rateLimiting.engines.brave.windowMinutes * 60 * 1000,
+    });
 }
 
 function fetchLogs() {
@@ -59,6 +79,11 @@ async function fetchBingPage(query: string, page: number): Promise<string> {
 
     return response.data;
   } catch (error) {
+    // Handle rate limiting (429) and other HTTP errors
+    if (axios.isAxiosError(error) && error.response?.status === 429) {
+      globalRateLimiter.markRateLimited("bing");
+      throw new Error("Bing rate limited (429)");
+    }
     throw new Error(
       `Bing search failed: ${
         error instanceof Error ? error.message : "Unknown error"
@@ -94,6 +119,11 @@ async function fetchBravePage(query: string, offset: number): Promise<string> {
     });
     return response.data;
   } catch (error) {
+    // Handle rate limiting (429) and other HTTP errors
+    if (axios.isAxiosError(error) && error.response?.status === 429) {
+      globalRateLimiter.markRateLimited("brave");
+      throw new Error("Brave rate limited (429)");
+    }
     throw new Error(
       `Brave search failed: ${
         error instanceof Error ? error.message : "Unknown error"
@@ -159,8 +189,17 @@ async function fetchDuckDuckGo(
   headers: Record<string, string>
 ): Promise<string> {
   fetchLogs();
-  const response = await axios.get(url, { headers });
-  return response.data;
+  try {
+    const response = await axios.get(url, { headers });
+    return response.data;
+  } catch (error) {
+    // Handle rate limiting (429) and other HTTP errors
+    if (axios.isAxiosError(error) && error.response?.status === 429) {
+      globalRateLimiter.markRateLimited("duckduckgo");
+      throw new Error("DuckDuckGo rate limited (429)");
+    }
+    throw error;
+  }
 }
 
 /**

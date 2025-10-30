@@ -9,9 +9,9 @@ const MAX_PAGES = 10;
  * @param $ Cheerio root instance
  * @returns Array of parsed search results
  */
-function parseResults($: cheerio.Root): SearchResult[] {
+function parseResults($: cheerio.CheerioAPI): SearchResult[] {
   return $("#b_results > .b_algo")
-    .map((i, element) => {
+    .map((i: any, element: any) => {
       const titleElement = $(element).find("h2");
       const linkElement = $(element).find("a").first();
       const snippetElement = $(element).find("p").first();

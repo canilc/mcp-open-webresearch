@@ -183,6 +183,7 @@ async function safePageNavigation(page: Page, url: string): Promise<void> {
         "#px-captcha",
         "#ddos-protection",
         "#waf-challenge-html",
+        '.captcha_text'
       ].some((selector) => document.querySelector(selector));
 
       const suspiciousTitle = [
@@ -269,9 +270,9 @@ async function extractContentAsMarkdown(
   try {
     return turndownService
       .turndown(html)
-      .replace(/\n{3,}/g, "\n\n")
-      .replace(/^- $/gm, "")
-      .replace(/^\s+$/gm, "")
+      .replaceAll(/\n{3,}/, "\n\n")
+      .replaceAll(/^- $/m, "")
+      .replaceAll(/^\s+$/m, "")
       .trim();
   } catch (error) {
     console.error("Markdown conversion failed:", error);
