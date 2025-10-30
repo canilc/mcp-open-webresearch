@@ -5,6 +5,7 @@ import {
   ProxyConfig,
   ProxyProtocol,
   ProxyAgent,
+  RateLimitConfig,
 } from "../types/app-config.js";
 
 const PROTOCOL_PATTERN = /^(https?|socks4a?|socks5):\/\//i;
@@ -49,7 +50,7 @@ const loadProxyConfig = (): ProxyConfig => {
       urlObject = new URL(proxyUrl);
       protocol = urlObject.protocol.replace(":", "") as ProxyProtocol;
       host = urlObject.hostname;
-      port = urlObject.port ? parseInt(urlObject.port, 10) : null;
+      port = urlObject.port ? Number.parseInt(urlObject.port, 10) : null;
       username = urlObject.username;
       password = urlObject.password;
 
@@ -86,6 +87,35 @@ const loadProxyConfig = (): ProxyConfig => {
   };
 };
 
+const loadRateLimitConfig = (): AppConfig["rateLimiting"] => {
+  const enabled = process.env.RATE_LIMITING_ENABLED === "true";
+
+  // Default rate limit: 30 requests per 1 minute per engine
+  const defaultConfig: RateLimitConfig = {
+    maxRequests: 30,
+    windowMinutes: 1,
+  };
+
+  const parseEngineConfig = (engineName: string): RateLimitConfig => {
+    const maxRequestsEnv = process.env[`RATE_LIMIT_${engineName.toUpperCase()}_MAX_REQUESTS`];
+    const windowMinutesEnv = process.env[`RATE_LIMIT_${engineName.toUpperCase()}_WINDOW_MINUTES`];
+
+    return {
+      maxRequests: maxRequestsEnv ? Number.parseInt(maxRequestsEnv, 10) : defaultConfig.maxRequests,
+      windowMinutes: windowMinutesEnv ? Number.parseInt(windowMinutesEnv, 10) : defaultConfig.windowMinutes,
+    };
+  };
+
+  return {
+    enabled,
+    engines: {
+      bing: parseEngineConfig("bing"),
+      duckduckgo: parseEngineConfig("duckduckgo"),
+      brave: parseEngineConfig("brave"),
+    },
+  };
+};
+
 export const loadConfig = (): Readonly<AppConfig> => {
   const config: AppConfig = {
     defaultSearchEngines: process.env.DEFAULT_SEARCH_ENGINES
@@ -97,6 +127,7 @@ export const loadConfig = (): Readonly<AppConfig> => {
     proxy: loadProxyConfig(),
     enableCors: process.env.ENABLE_CORS === "true",
     corsOrigin: process.env.CORS_ORIGIN || "*",
+    rateLimiting: loadRateLimitConfig(),
   };
 
   return Object.freeze(config);
