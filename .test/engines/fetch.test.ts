@@ -29,9 +29,18 @@ describe("Proxy Configuration Tests", () => {
 
     // Clear all mocks
     vi.clearAllMocks();
-    
+
     // Reset config mock
     mockLoadConfig.mockReturnValue({
+      rateLimiting: {
+        enabled: true,
+        engines: {
+          fetch: {
+            maxRequests: 100,
+            windowMs: 60000,
+          },
+        },
+      },
       proxy: {
         enabled: false,
         isValid: false,
@@ -52,9 +61,18 @@ describe("Proxy Configuration Tests", () => {
       http: { proxy: new URL(proxyUrl) },
       https: { proxy: new URL(proxyUrl) }
     };
-    
+
     // Mock the config loader to return our test configuration
     mockLoadConfig.mockReturnValue({
+      rateLimiting: {
+        enabled: true,
+        engines: {
+          fetch: {
+            maxRequests: 100,
+            windowMs: 60000,
+          },
+        },
+      },
       proxy: {
         enabled: true,
         isValid: true,
@@ -70,7 +88,7 @@ describe("Proxy Configuration Tests", () => {
 
     // Import the module to test
     const fetchModule = await import("../../src/engines/fetch/index.js");
-    
+
     // Verify the proxy agents were set
     expect(axios.defaults.httpAgent).toBe(mockAgentInstance.http);
     expect(axios.defaults.httpsAgent).toBe(mockAgentInstance.https);
@@ -79,6 +97,15 @@ describe("Proxy Configuration Tests", () => {
   it("should not set axios agents when proxy is disabled", async () => {
     // Mock config with proxy disabled
     mockLoadConfig.mockReturnValue({
+      rateLimiting: {
+        enabled: true,
+        engines: {
+          fetch: {
+            maxRequests: 100,
+            windowMs: 60000,
+          },
+        },
+      },
       proxy: {
         enabled: false,
         isValid: true,
@@ -119,6 +146,15 @@ describe("Proxy Configuration Tests", () => {
   it("should handle missing proxy configuration gracefully", async () => {
     // Mock config with no proxy configuration
     mockLoadConfig.mockReturnValue({
+      rateLimiting: {
+        enabled: true,
+        engines: {
+          fetch: {
+            maxRequests: 100,
+            windowMs: 60000,
+          },
+        },
+      },
       proxy: {
         enabled: false,
         isValid: false,
@@ -139,6 +175,15 @@ describe("Proxy Configuration Tests", () => {
   it("should handle empty proxy configuration gracefully", async () => {
     // Mock config with empty proxy configuration
     mockLoadConfig.mockReturnValue({
+      rateLimiting: {
+        enabled: true,
+        engines: {
+          fetch: {
+            maxRequests: 100,
+            windowMs: 60000,
+          },
+        },
+      },
       proxy: {
         enabled: false,
         isValid: false,
@@ -162,17 +207,17 @@ describe("Fetch Functions Tests", () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
-    
+
     // Reset axios defaults
     axios.defaults.httpAgent = undefined;
     axios.defaults.httpsAgent = undefined;
-    
+
     // Mock the fetch module
     vi.doMock("../../src/engines/fetch/index.js", () => ({
       fetchBingPage: vi.fn(),
       fetchBravePage: vi.fn(),
     }));
-    
+
     // Import the module after setting up mocks
     fetchModule = await import("../../src/engines/fetch/index.js");
   });

@@ -4,6 +4,15 @@ import { searchBrave } from "../../src/engines/brave";
 // Mock the config loader
 vi.mock("../../src/config/loader", () => ({
   loadConfig: vi.fn().mockReturnValue({
+    rateLimiting: {
+      enabled: true,
+      engines: {
+        brave: {
+          maxRequests: 100,
+          windowMs: 60000,
+        },
+      },
+    },
     proxy: {
       enabled: false,
       isValid: false,

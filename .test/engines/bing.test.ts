@@ -5,6 +5,15 @@ import { loadConfig } from "../../src/config/loader";
 // Mock the config loader
 vi.mock("../../src/config/loader", () => ({
   loadConfig: vi.fn().mockReturnValue({
+    rateLimiting: {
+      enabled: true,
+      engines: {
+        bing: {
+          maxRequests: 100,
+          windowMs: 60000,
+        },
+      },
+    },
     proxy: {
       enabled: false,
       isValid: false,

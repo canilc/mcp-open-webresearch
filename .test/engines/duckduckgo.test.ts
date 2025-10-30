@@ -4,6 +4,15 @@ import { searchDuckDuckGo } from "../../src/engines/duckduckgo";
 // Mock the config loader
 vi.mock("../../src/config/loader", () => ({
   loadConfig: vi.fn().mockReturnValue({
+    rateLimiting: {
+      enabled: true,
+      engines: {
+        duckduckgo: {
+          maxRequests: 100,
+          windowMs: 60000,
+        },
+      },
+    },
     proxy: {
       enabled: false,
       isValid: false,
