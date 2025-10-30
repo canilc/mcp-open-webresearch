@@ -146,7 +146,7 @@ async function main() {
     }
   });
 
-  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+  const PORT = process.env.PORT ? Number.parseInt(process.env.PORT, 10) : 3000;
   const transport = new StdioServerTransport();
   await mcpServer
     .connect(transport)
