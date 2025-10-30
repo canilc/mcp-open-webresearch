@@ -27,6 +27,13 @@ export interface ProxyConfig {
   agent?: ProxyAgent;
 }
 
+export interface RateLimitConfig {
+  // Maximum number of requests per engine
+  maxRequests: number;
+  // Time window in minutes
+  windowMinutes: number;
+}
+
 export interface AppConfig {
   // Search engine configuration (array of engines to use by default)
   defaultSearchEngines: ("bing" | "duckduckgo" | "brave")[];
@@ -35,4 +42,9 @@ export interface AppConfig {
   // CORS configuration
   enableCors: boolean;
   corsOrigin: string;
+  // Rate limiting configuration per engine
+  rateLimiting: {
+    enabled: boolean;
+    engines: Record<"bing" | "duckduckgo" | "brave", RateLimitConfig>;
+  };
 }
