@@ -270,9 +270,9 @@ async function extractContentAsMarkdown(
   try {
     return turndownService
       .turndown(html)
-      .replaceAll(/\n{3,}/, "\n\n")
-      .replaceAll(/^- $/m, "")
-      .replaceAll(/^\s+$/m, "")
+      .replaceAll(/\n{3,}/g, "\n\n")
+      .replaceAll(/^- $/gm, "")
+      .replaceAll(/^\s+$/gm, "")
       .trim();
   } catch (error) {
     console.error("Markdown conversion failed:", error);
